@@ -1,0 +1,6 @@
+[submodule "deps/k"]
+	path = deps/k
+	url = https://github.com/kframework/k
+[submodule "deps/evm-semantics"]
+	path = deps/evm-semantics
+	url = https://github.com/kframework/evm-semantics

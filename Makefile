@@ -84,9 +84,9 @@ LEMMA_FILES := $(patsubst %,$(SPECS_DIR)/%.k,$(LEMMA_NAMES))
 GEN_SPEC := scripts/gen-spec.py
 TMPLS    := scripts/module-tmpl.k scripts/spec-tmpl.k
 
-.PHONY: split-proof-tests
+.PHONY: specs
 
-split-proof-tests: $(SPECS_DIR) $(SPEC_FILES) $(LEMMA_FILES)
+specs: $(SPECS_DIR) $(SPEC_FILES) $(LEMMA_FILES)
 
 $(SPECS_DIR):
 	mkdir -p $@
@@ -122,9 +122,9 @@ KPROVE_OPTS += --z3-impl-timeout 500
 KPROVE_OPTS += --smt-prelude $(PRELUDE_FILE)
 KPROVE_OPTS += --concrete-rules $(shell cat $(CONCRETE_RULES_FILE) | tr '\n' ',')
 
-.PHONY: test
+.PHONY: verify
 
-test: $(addsuffix .test,$(SPEC_FILES))
+verify: $(addsuffix .test,$(SPEC_FILES))
 
 $(SPECS_DIR)/%-spec.k.test: $(SPECS_DIR)/%-spec.k
 	$(K_BIN)/kprove $(KPROVE_OPTS) $(shell grep "^[ ]*$*[ ]*|" spec-list.txt | cut -f 2 -d '|') $<

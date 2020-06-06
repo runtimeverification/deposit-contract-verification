@@ -20,8 +20,8 @@ The specification has been formally verified against the following compiled byte
 To verify the formal specification:
 ```
 $ make deps
-$ make split-proof-tests
-$ make test
+$ make specs
+$ make verify
 ```
 
 Prerequisites:

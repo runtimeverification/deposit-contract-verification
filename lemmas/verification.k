@@ -5,16 +5,14 @@ module VERIFICATION-L1
     imports VERIFICATION
 
   //rule #node(0, _, _) => 0
-    rule [node]:
-         #node(I +Int 1, N, M) => #if 1 &Int #size(I, N) ==Int 1
+    rule #node(I +Int 1, N, M) => #if 1 &Int #size(I, N) ==Int 1
                                   #then #sha256(#buf(32, select(M, I)) ++ #buf(32, #node(I, N, M)))
                                   #else #sha256(#buf(32, #node(I, N, M)) ++ #buf(32, select(M, 33 +Int I)))
                                   #fi
     requires 0 <=Int I andBool I <Int 32
 
   //rule #size(0, N) => N
-    rule [size]:
-         #size(I +Int 1, N) => #size(I, N) /Int 2
+    rule #size(I +Int 1, N) => #size(I, N) /Int 2
     requires 0 <=Int I andBool I <Int 32
 
 endmodule
@@ -122,23 +120,21 @@ module VERIFICATION
 
     syntax Int ::= #node(Int, Int, Map) [function, smtlib(nodeD)]
     rule #node(0, _, _) => 0
-    /* see module VERIFICATION-L1
-    rule #node(I +Int 1, N, M) => #if 1 &Int #size(I, N) ==Int 1
-                                  #then #sha256(#buf(32, select(M, I)) ++ #buf(32, #node(I, N, M)))
-                                  #else #sha256(#buf(32, #node(I, N, M)) ++ #buf(32, select(M, 33 +Int I)))
-                                  #fi
-    requires 0 <=Int I andBool I <Int 32
-    */
+  //rule #node(I +Int 1, N, M) => #if 1 &Int #size(I, N) ==Int 1
+  //                              #then #sha256(#buf(32, select(M, I)) ++ #buf(32, #node(I, N, M)))
+  //                              #else #sha256(#buf(32, #node(I, N, M)) ++ #buf(32, select(M, 33 +Int I)))
+  //                              #fi
+  //requires 0 <=Int I andBool I <Int 32
+  //see module VERIFICATION-L1
 
     rule 0 <=Int #node(_, _, _)             => true
     rule         #node(_, _, _) <Int pow256 => true
 
     syntax Int ::= #size(Int, Int) [function, smtlib(sizeD)]
     rule #size(0, N) => N
-    /* see module VERIFICATION-L1
-    rule #size(I +Int 1, N) => #size(I, N) /Int 2
-    requires 0 <=Int I andBool I <Int 32
-    */
+  //rule #size(I +Int 1, N) => #size(I, N) /Int 2
+  //requires 0 <=Int I andBool I <Int 32
+  //see module VERIFICATION-L1
 
     rule 0 <=Int #size(_, _)             => true
     rule         #size(_, _) <Int pow256 => true
@@ -209,6 +205,8 @@ module VERIFICATION
      andBool #isConcrete(N)
 
     rule bool2Word(B) => #if B #then 1 #else 0 #fi
+
+    // translation of the lemmas over bool2Word
 
     rule #if A #then 1 #else 0 #fi |Int #if B #then 1 #else 0 #fi => #if A  orBool B #then 1 #else 0 #fi
     rule #if A #then 1 #else 0 #fi &Int #if B #then 1 #else 0 #fi => #if A andBool B #then 1 #else 0 #fi

@@ -487,6 +487,7 @@ module LEMMAS
 
     rule #sha256(DATA) => #asWord(#parseHexBytes(Sha256(#unparseByteStack(DATA)))) [concrete]
 
+
     //////////////////////////
     // Gas Abstraction
     //////////////////////////

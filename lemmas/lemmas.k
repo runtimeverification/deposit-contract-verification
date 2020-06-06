@@ -493,182 +493,106 @@ module LEMMAS
 
     // see also abstract-semantics.k
 
+    syntax Int ::= #symGas(Schedule, Int, Int, Int, Int, Int) [function]
+  //rule #symGas(SCHED, GINIT, GBASE, GUSED, GCALL, MU) => GINIT -Int GBASE -Int GUSED -Int GCALL -Int Cmem(SCHED, MU)
 
-syntax Int ::= Int "-Gas" Int [function]
-syntax Int ::= Int "+Gas" Int [function]
+    syntax Int ::= #symMem(Int) [function]
+  //rule #symMem(MU) => MU up/Int 32
 
-//syntax Int ::= #evalGasCost(Int) [function]
-//rule #evalGasCost(#symGas(SCHED, _, GBASE, GUSED, 0, #symMem(MU))) => GBASE +Int GUSED +Int Cmem(SCHED, MU up/Int 32)
-
-syntax Int ::= #symGas(Schedule, Int, Int, Int, Int, Int) [function]
-// rule #symGas(SCHED, GINIT, GBASE, GUSED, GCALL, MU) => GINIT -Int GBASE -Int GUSED -Int GCALL -Int Cmem(SCHED, MU)
-
-syntax Int ::= #symMem(Int) [function]
-// rule #symMem(MU) => MU up/Int 32
-
-rule #symGas(SCHED, I, B, G, 0, MU) -Gas G' => #symGas(SCHED, I, B, G +Int G', 0, MU)
-requires #isConcrete(G') orBool #isItv(G')
-
-rule #symGas(SCHED, I, B, G, 0, MU) -Gas (Cgascap(SCHED, GCAP, GAVAIL, GEXTRA) +Int GEXTRA)
-  => #symGas(SCHED, I, B, G +Int GEXTRA, Cgascap(SCHED, GCAP, GAVAIL, GEXTRA), MU)
-requires #isConcrete(GEXTRA) orBool #isItv(GEXTRA)
-
-rule #symGas(SCHED, I, B, G, 0, MU) -Gas (Cmem(SCHED, MU') -Int Cmem(SCHED, MU))
-  => #symGas(SCHED, I, B, G, 0, MU')
-
-rule #symGas(SCHED, I, B, G, CAP, MU) +Gas #symGas(SCHED, CAP, 0, USED, 0, #symMem(MU'))
-  => #symGas(SCHED, I, B, G +Int USED +Int Cmem(SCHED, MU' up/Int 32), 0, MU)
-
-
-rule (A +Int I2) +Int I3 => A +Int (I2 +Int I3)
-requires notBool #isConcrete(A)
- andBool ( #isConcrete(I2) orBool #isItv(I2) )
- andBool ( #isConcrete(I3) orBool #isItv(I3) )
-
-
-// interval abstraction -- both bounds must be concrete
-syntax Int ::= #itv(Int, Int) [function]
-
-syntax Bool ::= #isItv(Int) [function]
-rule #isItv(#itv(_, _)) => true
-
-rule #itv(I1, I2) +Int J            => #itv(I1 +Int J,  I2 +Int J ) requires #isConcrete(J)
-rule #itv(I1, I2) +Int #itv(J1, J2) => #itv(I1 +Int J1, I2 +Int J2)
-rule I            +Int #itv(J1, J2) => #itv(I  +Int J1, I  +Int J2) requires #isConcrete(I)
-
-
-rule #memoryUsageUpdate(#symMem(MU), START, WIDTH) => #symMem(maxInt(MU, START +Int WIDTH))
-requires WIDTH >Int 0
-
-rule #memoryUsageUpdate(MU, START, WIDTH) => #symMem(maxInt(MU *Int 32, START +Int WIDTH))
-requires WIDTH >Int 0
- andBool #isConcrete(MU)
- andBool notBool (#isConcrete(START) andBool #isConcrete(WIDTH))
-
-rule maxInt(I1, I2) => I1 requires I1 >=Int I2
-rule maxInt(I1, I2) => I2 requires I1  <Int I2
-
-
-syntax Bool ::= #isInf(Int) [function]
-
-rule #isInf(#symGas(_, I, _, _, _, _)) => true requires #isInf(I)
-rule #isInf(Cgascap(_, GCAP, GAVAIL, GEXTRA)) => true requires #isInf(GCAP) andBool #isInf(GAVAIL) andBool notBool #isInf(GEXTRA)
-rule #isInf(Cmem(_, _)) => false
-
-rule #isInf(I1 -Int I2) => true requires #isInf(I1) andBool notBool #isInf(I2)
-rule #isInf(I1 -Int I2) => false requires notBool #isInf(I1) andBool notBool #isInf(I2)
-
-rule #isInf(I1 +Int I2) => true requires #isInf(I1) orBool #isInf(I2)
-
-rule #isInf(I) => false requires I <Int 2 ^Int 64 // practical maximum gas cost
-
-//rule G1 <=Int G2 => true requires notBool #isInf(G1) andBool #isInf(G2)
-
-
-rule G_CALL_STIPEND <Int #symGas(SCHED, I, _, _, _, _) => true
-requires G_CALL_STIPEND ==Int Gcallstipend < SCHED >
- andBool #isInf(I)
-
-rule #symGas(SCHED, I, _, _, _, _) <=Int G_CALL_STIPEND => false
-requires G_CALL_STIPEND ==Int Gcallstipend < SCHED >
- andBool #isInf(I)
-
-// [Csstore.new]:
-rule Csstore(SCHED, NEW, CURR, ORIG) => #itv(Gsload < SCHED >, Gsstoreset < SCHED >)
-    requires #isConcrete(SCHED)
-     andBool notBool ( #isConcrete(NEW) andBool #isConcrete(CURR) andBool #isConcrete(ORIG) )
-     andBool Ghasdirtysstore << SCHED >>
-
-// [Csstore.old]:
-rule Csstore(SCHED, NEW, CURR, ORIG) => #itv(Gsstorereset < SCHED >, Gsstoreset < SCHED >)
-    requires #isConcrete(SCHED)
-     andBool notBool ( #isConcrete(NEW) andBool #isConcrete(CURR) )
-     andBool notBool Ghasdirtysstore << SCHED >>
-
-//rule Cgascap(_, GCAP, GAVAIL, GEXTRA) => GCAP requires notBool #isInf(GCAP) andBool #isInf(GAVAIL) andBool notBool #isInf(GEXTRA)
-
-
-syntax KItem ::= #assert(Bool)
-
-
-
-
-
-/*
-    syntax Int ::= #symGas(Int, Int, Int, List, Int) [function]
-    syntax Int ::= #symMem(Int, Set) [function]
-
- // Definition
- // rule #symGas(INIT, LB, UB, S, MU) => INIT - [LB, UB] - sum(S) - MU
- // rule #symMem(N, S) => maxInt(N, maxIntSet(S)) up/Int 32
+  //syntax Int ::= #evalGasCost(Int) [function]
+  //rule #evalGasCost(#symGas(SCHED, _, GBASE, GUSED, 0, #symMem(MU))) => GBASE +Int GUSED +Int Cmem(SCHED, MU up/Int 32)
 
     syntax Int ::= Int "-Gas" Int [function]
     syntax Int ::= Int "+Gas" Int [function]
 
+    // normal #deductGas
+    rule #symGas(SCHED, I, B, G, 0, MU) -Gas G' => #symGas(SCHED, I, B, G +Int G', 0, MU)
+    requires #isConcrete(G') orBool #isItv(G')
+
+    // #deductGas for CALL
+    rule #symGas(SCHED, I, B, G, 0, MU) -Gas (Cgascap(SCHED, GCAP, GAVAIL, GEXTRA) +Int GEXTRA)
+      => #symGas(SCHED, I, B, G +Int GEXTRA, Cgascap(SCHED, GCAP, GAVAIL, GEXTRA), MU)
+    requires #isConcrete(GEXTRA) orBool #isItv(GEXTRA)
+
+    // #deductMemory
+    rule #symGas(SCHED, I, B, G, 0, MU) -Gas (Cmem(SCHED, MU') -Int Cmem(SCHED, MU))
+      => #symGas(SCHED, I, B, G, 0, MU')
+
+    // #refund from CALL
+    rule #symGas(SCHED, I, B, G, CAP, MU) +Gas #symGas(SCHED, CAP, 0, USED, 0, #symMem(MU'))
+      => #symGas(SCHED, I, B, G +Int USED +Int Cmem(SCHED, MU' up/Int 32), 0, MU)
+
+    rule (A +Int I2) +Int I3 => A +Int (I2 +Int I3)
+    requires notBool #isConcrete(A)
+     andBool ( #isConcrete(I2) orBool #isItv(I2) )
+     andBool ( #isConcrete(I3) orBool #isItv(I3) )
+
     // interval abstraction -- both bounds must be concrete
     syntax Int ::= #itv(Int, Int) [function]
 
-    syntax Int ::= #makeItv(Int, Int) [function]
-    rule #makeItv(X1, X2) => #itv(X1, X2) requires X1  <Int X2 andBool #isConcrete(X1) andBool #isConcrete(X2)
-    rule #makeItv(X1, X2) => X1           requires X1 ==Int X2 andBool #isConcrete(X1) andBool #isConcrete(X2)
+    syntax Bool ::= #isItv(Int) [function]
+    rule #isItv(#itv(_, _)) => true
 
-    // #memoryUsageUpdate
+    rule #itv(I1, I2) +Int J            => #itv(I1 +Int J,  I2 +Int J ) requires #isConcrete(J)
+    rule #itv(I1, I2) +Int #itv(J1, J2) => #itv(I1 +Int J1, I2 +Int J2)
+    rule I            +Int #itv(J1, J2) => #itv(I  +Int J1, I  +Int J2) requires #isConcrete(I)
 
-    rule #memoryUsageUpdate(#symMem(MU, MUS), START, WIDTH) => #symMem(maxInt(MU, START +Int WIDTH), MUS)
-        requires #isConcrete(MU) andBool #isConcrete(START) andBool #isConcrete(WIDTH)
+    // memoryUsage
 
-    rule #memoryUsageUpdate(#symMem(MU, MUS), START, WIDTH) => #symMem(MU, SetItem(START +Int WIDTH) MUS)
-        requires notBool (#isConcrete(START) andBool #isConcrete(WIDTH))
+    rule #memoryUsageUpdate(#symMem(MU), START, WIDTH) => #symMem(maxInt(MU, START +Int WIDTH))
+    requires WIDTH >Int 0
 
-    rule #memoryUsageUpdate(        MU,       START, WIDTH) => #symMem(MU, SetItem(START +Int WIDTH) .Set)
-        requires #isConcrete(MU) andBool notBool (#isConcrete(START) andBool #isConcrete(WIDTH))
+    rule #memoryUsageUpdate(MU, START, WIDTH) => #symMem(maxInt(MU *Int 32, START +Int WIDTH))
+    requires WIDTH >Int 0
+     andBool #isConcrete(MU)
+     andBool notBool (#isConcrete(START) andBool #isConcrete(WIDTH))
 
-    // deductGas
+    rule maxInt(I1, I2) => I1 requires I1 >=Int I2
+    rule maxInt(I1, I2) => I2 requires I1  <Int I2
 
-    rule #symGas(I, LB, UB, S, CMEM) -Gas G              => #symGas(I, LB +Int G,   UB +Int G,               S, CMEM)
-        requires #isConcrete(G)
+    // infinite gas abstraction
 
-    rule #symGas(I, LB, UB, S, CMEM) -Gas #itv(LB', UB') => #symGas(I, LB +Int LB', UB +Int UB',             S, CMEM)
+    syntax Bool ::= #isInf(Int) [function]
 
-    rule #symGas(I, LB, UB, S, CMEM) -Gas G              => #symGas(I, LB,          UB,          ListItem(G) S, CMEM)
-        requires (notBool #isConcrete(G)) andBool #getKLabelString(G) =/=String "#itv" andBool #getKLabelString(G) =/=String "_+Int_"
+    rule #isInf(#symGas(_, I, _, _, _, _)) => true requires #isInf(I)
 
-    rule G -Gas (G1 +Int G2) => (G -Gas G1) -Gas G2
+    // for call gas being all available gas
+    rule #isInf(Cgascap(_, GCAP, GAVAIL, GEXTRA)) => true requires #isInf(GCAP) andBool #isInf(GAVAIL) andBool notBool #isInf(GEXTRA)
 
-    // refund
+    rule #isInf(Cmem(_, _)) => false // memory usage is finite
 
-    rule #symGas(X,                   LB,          UB,          ListItem(C) S, CMEM) +Gas #symGas(CGASCAP,                   LB', UB', S', CMEM')
-      => #symGas(X,                   LB +Int LB', UB +Int UB', S'          S, CMEM) -Gas CMEM'
-        requires C ==K CGASCAP
-         andBool isPositiveGas(#symGas(CGASCAP,                   LB', UB', S', CMEM'))
+    rule #isInf(I1 +Int I2) => true requires #isInf(I1) orBool #isInf(I2)
 
-    rule #symGas(X,                   LB,          UB,          ListItem(C) S, CMEM) +Gas #symGas(CGASCAP +Int CCALLSTIPEND, LB', UB', S', CMEM')
-      => #symGas(X +Int CCALLSTIPEND, LB +Int LB', UB +Int UB', S'          S, CMEM) -Gas CMEM'
-        requires C ==K CGASCAP
-         andBool isPositiveGas(#symGas(CGASCAP +Int CCALLSTIPEND, LB', UB', S', CMEM'))
+    rule #isInf(I1 -Int I2) => true requires #isInf(I1) andBool notBool #isInf(I2)
+    rule #isInf(I1 -Int I2) => false requires notBool #isInf(I1) andBool notBool #isInf(I2)
 
-    syntax Bool ::= isPositiveGas(Int) [function]
+    rule #isInf(I) => false requires I <Int 2 ^Int 64 // practical maximum gas cost
 
-    syntax Bool ::= isInitGas(Int) [function]
+    // rule G1 <=Int G2 => true requires notBool #isInf(G1) andBool #isInf(G2) // prohibitive: significant performance overhead
 
-    // call with constant gas (particularly for precompiled contract calls)
-    rule isPositiveGas(#symGas(Cgascap(_, G, #symGas(IG, _, _, _, _), _),                   _, UB, .List, 0)) => G                   >=Int UB
-        requires isInitGas(IG) andBool #isConcrete(G) andBool #isConcrete(UB)
-    rule isPositiveGas(#symGas(Cgascap(_, G, #symGas(IG, _, _, _, _), _) +Int CCALLSTIPEND, _, UB, .List, 0)) => G +Int CCALLSTIPEND >=Int UB
-        requires isInitGas(IG) andBool #isConcrete(G) andBool #isConcrete(UB) andBool #isConcrete(CCALLSTIPEND)
+    // for SSTORE in Istanbul
 
-    // call with all available gas
-    rule isPositiveGas(#symGas(Cgascap(_, #symGas(IG, _, _, _, _), _, _),        _, _, _, _)) => true
-        requires isInitGas(IG)
-    rule isPositiveGas(#symGas(Cgascap(_, #symGas(IG, _, _, _, _), _, _) +Int _, _, _, _, _)) => true
-        requires isInitGas(IG)
+    rule G_CALL_STIPEND <Int #symGas(SCHED, I, _, _, _, _) => true
+    requires G_CALL_STIPEND ==Int Gcallstipend < SCHED >
+     andBool #isInf(I)
 
-    //  Cs*
+    rule #symGas(SCHED, I, _, _, _, _) <=Int G_CALL_STIPEND => false
+    requires G_CALL_STIPEND ==Int Gcallstipend < SCHED >
+     andBool #isInf(I)
 
-    rule Csstore(SCHED, NEW, CURR, ORIG) => #makeItv(Gsstorereset < SCHED >, Gsstoreset < SCHED >)
+    // [Csstore.new]:
+    rule Csstore(SCHED, NEW, CURR, ORIG) => #itv(Gsload < SCHED >, Gsstoreset < SCHED >)
+        requires #isConcrete(SCHED)
+         andBool notBool ( #isConcrete(NEW) andBool #isConcrete(CURR) andBool #isConcrete(ORIG) )
+         andBool Ghasdirtysstore << SCHED >>
+
+    // [Csstore.old]:
+    rule Csstore(SCHED, NEW, CURR, ORIG) => #itv(Gsstorereset < SCHED >, Gsstoreset < SCHED >)
         requires #isConcrete(SCHED)
          andBool notBool ( #isConcrete(NEW) andBool #isConcrete(CURR) )
          andBool notBool Ghasdirtysstore << SCHED >>
-*/
+
+    // for specific amount of call gas
+    // rule Cgascap(_, GCAP, GAVAIL, GEXTRA) => GCAP requires notBool #isInf(GCAP) andBool #isInf(GAVAIL) andBool notBool #isInf(GEXTRA)
 
 endmodule

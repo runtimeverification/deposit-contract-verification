@@ -1,4 +1,4 @@
-# Formal Verification of Ethereum 2.0 Deposit Smart Contract
+# Formal Verification of Ethereum 2.0 Deposit Contract
 
 This presents the formal verification of the [deposit contract] written in Solidity.
 

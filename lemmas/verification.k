@@ -28,6 +28,8 @@ requires #sizeWordStack(WS) ==Int 28
 
 // for to_little_endian_64()
 
+// redundant extra bit operation: ((115339776388732929035197660848497720713218148788040405586178452820382218977280 /* 0xff000...000 */ &Int chop(DEPOSIT_COUNT_i <<Int 248)) >>Int 248) modInt 256
+
 // masking first 8 bits
 rule 115339776388732929035197660848497720713218148788040405586178452820382218977280 &Int
      chop(X <<Int 248)

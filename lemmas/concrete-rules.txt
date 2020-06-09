@@ -28,5 +28,4 @@ EVM.Csstore.new
 EVM.Csstore.old
 EVM.Rsstore.new
 EVM.Rsstore.old
-EVM.Cextra
 EVM.Cmem

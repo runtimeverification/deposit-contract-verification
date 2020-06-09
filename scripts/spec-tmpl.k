@@ -33,7 +33,7 @@ rule
       ...
     </evm>
     <network>
-      <activeAccounts> {ACTIVE_ACCOUNTS} SetItem({THIS}) SetItem(2) SetItem(4) _:Set </activeAccounts>
+      <activeAccounts> {ACTIVE_ACCOUNTS} SetItem({THIS}) SetItem(2) _:Set </activeAccounts>
       <accounts>
         <account>
           <acctID> {THIS} </acctID>
@@ -46,16 +46,7 @@ rule
         <account>
           // precompiled account for SHA256
           <acctID> 2 </acctID>
-          <balance> 0 </balance>
-          <code> .WordStack </code>
-          <storage> .Map </storage>
-          <origStorage> .Map </origStorage>
-          <nonce> 0 </nonce>
-        </account>
-        <account>
-          // precompiled account for ID
-          <acctID> 4 </acctID>
-          <balance> 0 </balance>
+          <balance> PRECOMPILED_SHA256_BALANCE </balance>
           <code> .WordStack </code>
           <storage> .Map </storage>
           <origStorage> .Map </origStorage>
@@ -69,8 +60,9 @@ rule
   </ethereum>
   ...
 </kevm>
-  requires true
-   {REQUIRES}
-  ensures true
-   {ENSURES}
+requires true
+andBool #rangeUInt(256, PRECOMPILED_SHA256_BALANCE)
+{REQUIRES}
+ensures true
+{ENSURES}
 {ATTRIBUTE}

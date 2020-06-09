@@ -29,6 +29,18 @@ module VERIFICATION
 
     // for to_little_endian_64()
 
+    syntax WordStack ::= #toLittleEndian64(Int) [function]
+    rule #toLittleEndian64(N)
+      =>    N           modInt 256  /* bytesValue[7] == (chop(N <<Int 192) >>Int 192) modInt 256 */
+         : (N >>Int  8) modInt 256  /* bytesValue[6] == (chop(N <<Int 192) >>Int 200) modInt 256 */
+         : (N >>Int 16) modInt 256  /* bytesValue[5] == (chop(N <<Int 192) >>Int 208) modInt 256 */
+         : (N >>Int 24) modInt 256  /* bytesValue[4] == (chop(N <<Int 192) >>Int 216) modInt 256 */
+         : (N >>Int 32) modInt 256  /* bytesValue[3] == (chop(N <<Int 192) >>Int 224) modInt 256 */
+         : (N >>Int 40) modInt 256  /* bytesValue[2] == (chop(N <<Int 192) >>Int 232) modInt 256 */
+         : (N >>Int 48) modInt 256  /* bytesValue[1] == (chop(N <<Int 192) >>Int 240) modInt 256 */
+         : (N >>Int 56) modInt 256  /* bytesValue[0] == (chop(N <<Int 192) >>Int 248) modInt 256 */
+         : .WordStack
+
     // redundant extra bit operation: ((115339776388732929035197660848497720713218148788040405586178452820382218977280 /* 0xff000...000 */ &Int chop(DEPOSIT_COUNT_i <<Int 248)) >>Int 248) modInt 256
 
     // masking first 8 bits

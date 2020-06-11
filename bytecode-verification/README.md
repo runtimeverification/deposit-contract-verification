@@ -26,6 +26,11 @@ $ make verify
 
 Prerequisites:
  * Install Z3 (4.6.0): https://github.com/Z3Prover/z3/releases/tag/z3-4.6.0
+   * Set environment variables:
+     ```
+     export PATH=/path/to/z3-4.6.0/bin:$PATH
+     export LD_LIBRARY_PATH=/path/to/z3-4.6.0//bin:$LD_LIBRARY_PATH
+     ```
  * System dependencies: https://github.com/kframework/evm-semantics#system-dependencies
 
 ## [Resources]

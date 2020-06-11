@@ -4,7 +4,7 @@
 BUILD_DIR      := .build
 DEFN_DIR       := $(BUILD_DIR)/defn
 
-DEPS_DIR       := deps
+DEPS_DIR       := ../deps
 K_SUBMODULE    := $(abspath $(DEPS_DIR)/k)
 KEVM_SUBMODULE := $(abspath $(DEPS_DIR)/evm-semantics)
 

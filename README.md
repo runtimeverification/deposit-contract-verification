@@ -10,8 +10,8 @@ in Solidity. The formal verification of the initial Vyper implementation can be 
 Documents:
  * Final report: [`deposit-contract-verification.pdf`](deposit-contract-verification.pdf)
  * Blog posts:
-   * [Formal Verification of Ethereum 2.0 Deposit Contract (Part I)](https://runtimeverification.com/blog/formal-verification-of-ethereum-2-0-deposit-contract-part-1/)
-   * [End-to-End Formal Verification of Ethereum 2.0 Deposit Smart Contract](https://runtimeverification.com/blog/end-to-end-formal-verification-of-ethereum-2-0-deposit-smart-contract/)
+   * [Formal Verification of Ethereum 2.0 Deposit Contract (Part I)](https://runtimeverification.com/blog/formal-verification-of-ethereum-2-0-deposit-contract-part-1/) (June 12, 2019)
+   * [End-to-End Formal Verification of Ethereum 2.0 Deposit Smart Contract](https://runtimeverification.com/blog/end-to-end-formal-verification-of-ethereum-2-0-deposit-smart-contract/) (January 20, 2020)
 
 Verification artifacts:
  * [`algorithm-correctness/`](algorithm-correctness): Formalization and correctness proof of incremental Merkle tree algorithm

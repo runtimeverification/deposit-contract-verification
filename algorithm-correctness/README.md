@@ -1,6 +1,6 @@
 # Formalization and Correctness Proof of Incremental Merkle Tree Algorithm of Deposit Contract
 
-Our formalization of the [incremental Merkle tree algorithm], especially the one employed in the [deposit contract], and its correctness proof w.r.t. the [original full-construction Merkle tree algorithm] can be found in [the final report](../deposit-formal-verification.pdf).
+Our formalization of the [incremental Merkle tree algorithm], especially the one employed in the [deposit contract], and its correctness proof w.r.t. the [original full-construction Merkle tree algorithm] can be found in [the final report](../deposit-contract-verification.pdf).
 
 The correctness proof presented in the report has also been mechanized in K:
  * [deposit.k](deposit.k): Formal model of the incremental Merkle tree algorithm

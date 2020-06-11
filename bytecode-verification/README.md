@@ -1,9 +1,8 @@
-# Formal Verification of Ethereum 2.0 Deposit Contract
+# Bytecode Verification of Deposit Contract
 
 This presents the formal verification of the [deposit contract] written in Solidity.
 
-Formal specification:
- * [`deposit-spec.ini`](deposit-spec.ini):
+A formal specification (written in the [eDSL] specification language) is given in: [`deposit-spec.ini`](deposit-spec.ini)
 
 The specification has been formally verified against the following compiled bytecode by the Solidity compiler [v0.6.8] with the optimization enabled (`--optimize-runs 5000000`):
  * Contract creation bytecode:
@@ -37,9 +36,13 @@ Prerequisites:
 
 ## [Disclaimer]
 
+## [License]
+
 [deposit contract]: <https://github.com/axic/eth2-deposit-contract/blob/r1/deposit_contract.sol>
 [`validator_registration.json`]: <https://github.com/axic/eth2-deposit-contract/blob/r1/deposit_contract.json>
 [v0.6.8]: <https://github.com/ethereum/solidity/releases/tag/v0.6.8>
+[eDSL]: <https://github.com/runtimeverification/verified-smart-contracts/blob/master/resources/edsl.md>
 
 [Resources]: <https://github.com/runtimeverification/verified-smart-contracts/blob/master/README.md#resources>
 [Disclaimer]: <https://github.com/runtimeverification/verified-smart-contracts/blob/master/README.md#disclaimer>
+[License]: <https://github.com/runtimeverification/verified-smart-contracts/blob/master/README.md#license>

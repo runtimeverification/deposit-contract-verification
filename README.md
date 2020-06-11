@@ -5,7 +5,7 @@
 This provides the artifact of our end-to-end formal verification of the Ethereum 2.0 [deposit contract].
 
 Documents:
- * Final report: [`deposit-formal-verification.pdf`](deposit-formal-verification.pdf)
+ * Final report: [`deposit-contract-verification.pdf`](deposit-contract-verification.pdf)
  * Blog posts:
    * [Formal Verification of Ethereum 2.0 Deposit Contract (Part I)](https://runtimeverification.com/blog/formal-verification-of-ethereum-2-0-deposit-contract-part-1/)
    * [End-to-End Formal Verification of Ethereum 2.0 Deposit Smart Contract](https://runtimeverification.com/blog/end-to-end-formal-verification-of-ethereum-2-0-deposit-smart-contract/)

@@ -22,6 +22,8 @@ module VERIFICATION
     imports EDSL
     imports LEMMAS
 
+    rule #sizeByteArray(WS) => #sizeWordStack(WS)
+
     // function signature extraction
 
     rule #asWord(B1 : B2 : B3 : B4 : WS) >>Int 224 => #asWord(B1 : B2 : B3 : B4 : .WordStack)

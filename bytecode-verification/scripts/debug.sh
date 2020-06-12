@@ -38,6 +38,6 @@
 
   make clean
   make specs
-  make verify
+  make -j4 verify
 
   date

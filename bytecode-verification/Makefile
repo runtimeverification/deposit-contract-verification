@@ -87,7 +87,7 @@ $(SPECS_DIR)/deposit-success-spec.k: $(TMPLS) $(SPEC_INI)
 # Kprove
 # ------
 
-K_OPTS ?= -Xmx24g
+K_OPTS ?= -Xmx8g
 export K_OPTS
 
 PRELUDE_FILE        := lemmas/evm.smt2

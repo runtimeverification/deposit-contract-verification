@@ -1,4 +1,4 @@
-requires "edsl.k"
+requires "edsl.md"
 requires "lemmas.k"
 
 module VERIFICATION-L1

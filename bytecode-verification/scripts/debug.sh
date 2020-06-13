@@ -36,8 +36,8 @@
 
 # export KPROVE_OPTS
 
-  make clean
+  make clean-specs
   make specs
-  make verify
+  make -j4 verify
 
   date

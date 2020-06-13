@@ -36,7 +36,7 @@ KEVM_MAKE := make --directory $(KEVM_SUBMODULE) DEPS_DIR=$(KEVM_SUBMODULE)/deps 
 
 deps: deps-k deps-kevm
 deps-k:
-	$(KEVM_MAKE) deps
+	$(KEVM_MAKE) deps SKIP_LLVM=true SKIP_HASKELL=true
 deps-kevm:
 	$(KEVM_MAKE) build-java
 

@@ -64,16 +64,15 @@ TMPLS    := scripts/module-tmpl.k scripts/spec-tmpl.k
 
 .PHONY: specs
 
-specs: $(SPECS_DIR) $(SPEC_FILES) $(LEMMA_FILES)
-
-$(SPECS_DIR):
-	mkdir -p $@
+specs: $(SPEC_FILES) $(LEMMA_FILES)
 
 $(SPECS_DIR)/%-spec.k: $(TMPLS) $(SPEC_INI)
+    @mkdir -p $(dir $@)
 	python3 $(GEN_SPEC) $(TMPLS) $(SPEC_INI) $* $* > $@
 
 $(SPECS_DIR)/%.k: lemmas/%.k
-	cp -p $< $@
+    @mkdir -p $(dir $@)
+	cp $< $@
 
 # non-standard spec generation
 

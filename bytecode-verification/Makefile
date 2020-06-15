@@ -7,9 +7,14 @@ DEFN_DIR       := $(BUILD_DIR)/defn
 SPECS_DIR      := $(BUILD_DIR)/specs
 KEVM_SUBMODULE ?= $(CURDIR)/$(DEPS_DIR)/evm-semantics
 
-K_RELEASE ?= $(KEVM_SUBMODULE)/deps/k/k-distribution/target/release/k
-K_BIN     := $(K_RELEASE)/bin
-K_LIB     := $(K_RELEASE)/lib
+K_SUBMODULE := $(KEVM_SUBMODULE)/deps/k
+ifneq (,$(wildcard $(K_SUBMODULE)/k-distribution/target/release/k/bin/*))
+    K_RELEASE ?= $(abspath $(K_SUBMODULE)/k-distribution/target/release/k)
+else
+    K_RELEASE ?= $(dir $(shell which kompile))..
+endif
+K_BIN := $(K_RELEASE)/bin
+K_LIB := $(K_RELEASE)/lib/kframework
 export K_RELEASE
 
 PATH := $(K_BIN):$(PATH)
@@ -18,19 +23,13 @@ export PATH
 PYTHONPATH := $(K_LIB)
 export PYTHONPATH
 
-PANDOC_TANGLE_SUBMODULE := $(KEVM_SUBMODULE)/deps/pandoc-tangle
-TANGLER                 := $(PANDOC_TANGLE_SUBMODULE)/tangle.lua
-LUA_PATH                := $(PANDOC_TANGLE_SUBMODULE)/?.lua;;
-export TANGLER
-export LUA_PATH
-
 # no intermediate target is removed
 .SECONDARY:
 
 # Dependencies
 # ------------
 
-KEVM_MAKE := make --directory $(KEVM_SUBMODULE) DEPS_DIR=$(KEVM_SUBMODULE)/deps BUILD_DIR=$(CURDIR)/$(BUILD_DIR) K_RELEASE=$(K_RELEASE)
+KEVM_MAKE := make --directory $(KEVM_SUBMODULE) DEPS_DIR=$(KEVM_SUBMODULE)/deps BUILD_DIR=$(CURDIR)/$(BUILD_DIR) K_RELEASE=$(K_RELEASE) RELEASE=$(RELEASE)
 
 .PHONY: deps deps-k deps-kevm
 

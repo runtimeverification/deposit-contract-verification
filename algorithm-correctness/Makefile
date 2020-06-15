@@ -108,3 +108,30 @@ $(symbolic_kompiled): $(symbolic_files)
 	                --directory $(symbolic_dir) -I $(CURDIR)  \
 	                --main-module $(symbolic_main_module)     \
 	                --syntax-module $(symbolic_syntax_module)
+
+# Tests
+# -----
+
+CHECK := git --no-pager diff --no-index --ignore-all-space -R
+
+test: test-concrete test-symbolic
+
+### Concrete Tests
+
+concrete_tests := $(wildcard tests/concrete/*.deposit)
+
+test-concrete: $(concrete_tests:=.run)
+
+tests/concrete/%.run: tests/concrete/% $(concrete_kompiled)
+	krun --directory $(concrete_dir) --smt none -cTREEHEIGHT=3 $< > $<.out
+	$(CHECK) $<.out $<.expected
+
+### Symbolic Tests
+
+symbolic_tests := $(wildcard tests/symbolic/*-spec.k)
+
+test-symbolic: $(symbolic_tests:=.prove)
+
+tests/symbolic/%.prove: tests/symbolic/% $(symbolic_kompiled)
+	kprove --directory $(symbolic_dir) --smt-prelude imap.smt2 $< > $<.out
+	$(CHECK) $<.out $<.expected

@@ -98,7 +98,7 @@ symbolic_dir           := $(DEFN_DIR)/symbolic
 symbolic_files         := $(ALL_FILES)
 symbolic_main_module   := DEPOSIT-SYMBOLIC
 symbolic_syntax_module := $(symbolic_main_module)
-symbolic_main_file     := deposit
+symbolic_main_file     := deposit-symbolic
 symbolic_kompiled      := $(symbolic_dir)/$(symbolic_main_file)-kompiled/timestamp
 
 build-symbolic: $(symbolic_kompiled)

@@ -15,8 +15,9 @@ pipeline {
       stages {
         stage('Build') {
           parallel {
-            stage('Bytecode Verification') { steps { sh 'cd bytecode-verification && make specs RELEASE=true -j6' } }
-            stage('Algorithm Correctness') { steps { sh 'cd algorithm-correctness && make build RELEASE=true -j6' } }
+            stage('KEVM')                        { steps { sh 'cd bytecode-verification && make deps-kevm RELEASE=true -j6' } }
+            stage('Bytecode Verification Specs') { steps { sh 'cd bytecode-verification && make specs     RELEASE=true -j6' } }
+            stage('Algorithm Correctness')       { steps { sh 'cd algorithm-correctness && make build     RELEASE=true -j6' } }
           }
         }
         stage('Test Execution') {

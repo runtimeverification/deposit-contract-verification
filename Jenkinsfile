@@ -15,15 +15,15 @@ pipeline {
       stages {
         stage('Build') {
           parallel {
-            stage('Bytecode Verification') { steps { sh 'cd bytecode-verification && make build RELEASE=true -j6' } }
+            stage('Bytecode Verification') { steps { sh 'cd bytecode-verification && make specs RELEASE=true -j6' } }
             stage('Algorithm Correctness') { steps { sh 'cd algorithm-correctness && make build RELEASE=true -j6' } }
           }
         }
         stage('Test Execution') {
           options { timeout(time: 25, unit: 'MINUTES') }
           parallel {
-            stage('Bytecode Verification') { steps { sh 'cd bytecode-verification && make test -j8' } }
-            stage('Algorithm Correctness') { steps { sh 'cd algorithm-correctness && make test -j8' } }
+            stage('Bytecode Verification') { steps { sh 'cd bytecode-verification && make verify -j8' } }
+            stage('Algorithm Correctness') { steps { sh 'cd algorithm-correctness && make test   -j8' } }
           }
         }
       }

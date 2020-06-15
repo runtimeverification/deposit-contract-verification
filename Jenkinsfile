@@ -23,8 +23,9 @@ pipeline {
         stage('Test Execution') {
           options { timeout(time: 25, unit: 'MINUTES') }
           parallel {
-            stage('Bytecode Verification') { steps { sh 'cd bytecode-verification && make verify -j8' } }
-            stage('Algorithm Correctness') { steps { sh 'cd algorithm-correctness && make test   -j8' } }
+            stage('Bytecode Verification')            { steps { sh 'cd bytecode-verification && make verify        -j4' } }
+            stage('Algorithm Correctness - Concrete') { steps { sh 'cd algorithm-correctness && make test-concrete -j4' } }
+            stage('Algorithm Correctness - Symbolic') { steps { sh 'cd algorithm-correctness && make test-symbolic -j4' } }
           }
         }
       }

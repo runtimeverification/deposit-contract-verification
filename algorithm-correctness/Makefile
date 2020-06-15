@@ -87,7 +87,7 @@ concrete_kompiled      := $(concrete_dir)/$(concrete_main_file)-kompiled/timesta
 build-concrete: $(concrete_kompiled)
 
 $(concrete_kompiled): $(concrete_files)
-	$(KOMPILE_JAVA) $(concrete_main_file).md                  \
+	$(KOMPILE_JAVA) $(concrete_main_file).k                   \
 	                --directory $(concrete_dir) -I $(CURDIR)  \
 	                --main-module $(concrete_main_module)     \
 	                --syntax-module $(concrete_syntax_module)
@@ -104,7 +104,7 @@ symbolic_kompiled      := $(symbolic_dir)/$(symbolic_main_file)-kompiled/timesta
 build-symbolic: $(symbolic_kompiled)
 
 $(symbolic_kompiled): $(symbolic_files)
-	$(KOMPILE_JAVA) $(symbolic_main_file).md                  \
+	$(KOMPILE_JAVA) $(symbolic_main_file).k                   \
 	                --directory $(symbolic_dir) -I $(CURDIR)  \
 	                --main-module $(symbolic_main_module)     \
 	                --syntax-module $(symbolic_syntax_module)

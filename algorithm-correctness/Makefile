@@ -128,10 +128,16 @@ tests/concrete/%.run: tests/concrete/% $(concrete_kompiled)
 
 ### Symbolic Tests
 
+KPROVE_OPTS :=
+
+ifneq (,$(DEBUG_KPROVE))
+    KPROVE_OPTS += -v --debug --log --log-rules --debug-z3-queries --log-cells k,depositCount,branch,zerohashes,#pc,#result
+endif
+
 symbolic_tests := $(wildcard tests/symbolic/*-spec.k)
 
 test-symbolic: $(symbolic_tests:=.prove)
 
 tests/symbolic/%.prove: tests/symbolic/% $(symbolic_kompiled)
-	kprove --directory $(symbolic_dir) --smt-prelude imap.smt2 $< > $<.out
+	kprove --directory $(symbolic_dir) --smt-prelude imap.smt2 $< $(KPROVE_OPTS) > $<.out
 	$(CHECK) $<.out $<.expected

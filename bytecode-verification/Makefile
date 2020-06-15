@@ -67,11 +67,11 @@ TMPLS    := scripts/module-tmpl.k scripts/spec-tmpl.k
 specs: $(SPEC_FILES) $(LEMMA_FILES)
 
 $(SPECS_DIR)/%-spec.k: $(TMPLS) $(SPEC_INI)
-    @mkdir -p $(dir $@)
+	@mkdir -p $(dir $@)
 	python3 $(GEN_SPEC) $(TMPLS) $(SPEC_INI) $* $* > $@
 
 $(SPECS_DIR)/%.k: lemmas/%.k
-    @mkdir -p $(dir $@)
+	@mkdir -p $(dir $@)
 	cp $< $@
 
 # non-standard spec generation

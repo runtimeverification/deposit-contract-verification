@@ -2,15 +2,19 @@
 # --------
 
 BUILD_DIR      := .build
-DEFN_DIR       := $(BUILD_DIR)/defn
-
 DEPS_DIR       := ../deps
-K_SUBMODULE    := $(abspath $(DEPS_DIR)/k)
-KEVM_SUBMODULE := $(abspath $(DEPS_DIR)/evm-semantics)
+DEFN_DIR       := $(BUILD_DIR)/defn
+SPECS_DIR      := $(BUILD_DIR)/specs
+KEVM_SUBMODULE ?= $(CURDIR)/$(DEPS_DIR)/evm-semantics
 
-K_RELEASE ?= $(K_SUBMODULE)/k-distribution/target/release/k
-K_BIN     := $(K_RELEASE)/bin
-K_LIB     := $(K_RELEASE)/lib
+K_SUBMODULE := $(KEVM_SUBMODULE)/deps/k
+ifneq (,$(wildcard $(K_SUBMODULE)/k-distribution/target/release/k/bin/*))
+    K_RELEASE ?= $(abspath $(K_SUBMODULE)/k-distribution/target/release/k)
+else
+    K_RELEASE ?= $(dir $(shell which kompile))..
+endif
+K_BIN := $(K_RELEASE)/bin
+K_LIB := $(K_RELEASE)/lib/kframework
 export K_RELEASE
 
 PATH := $(K_BIN):$(PATH)
@@ -19,59 +23,33 @@ export PATH
 PYTHONPATH := $(K_LIB)
 export PYTHONPATH
 
-PANDOC_TANGLE_SUBMODULE := $(KEVM_SUBMODULE)/deps/pandoc-tangle
-TANGLER                 := $(PANDOC_TANGLE_SUBMODULE)/tangle.lua
-LUA_PATH                := $(PANDOC_TANGLE_SUBMODULE)/?.lua;;
-export TANGLER
-export LUA_PATH
-
 # no intermediate target is removed
 .SECONDARY:
 
 # Dependencies
 # ------------
 
-KEVM_BUILD := $(KEVM_SUBMODULE)/.build/defn/java
+KEVM_MAKE := make --directory $(KEVM_SUBMODULE) DEPS_DIR=$(KEVM_SUBMODULE)/deps BUILD_DIR=$(CURDIR)/$(BUILD_DIR) K_RELEASE=$(K_RELEASE) RELEASE=$(RELEASE)
 
 .PHONY: deps deps-k deps-kevm
 
 deps: deps-k deps-kevm
-deps-k:    $(K_SUBMODULE)/mvn.timestamp
-deps-kevm: $(KEVM_SUBMODULE)/make.timestamp
+deps-k:
+	$(KEVM_MAKE) deps SKIP_LLVM=true SKIP_HASKELL=true
+deps-kevm:
+	$(KEVM_MAKE) build-java
 
-%/submodule.timestamp:
-	git submodule update --init --recursive -- $*
-	touch $@
+.PHONY: clean clean-k clean-kevm
 
-$(K_SUBMODULE)/mvn.timestamp: $(K_SUBMODULE)/submodule.timestamp
-	cd $(K_SUBMODULE) \
-		&& mvn package -DskipTests -Dllvm.backend.skip -Dhaskell.backend.skip -Dproject.build.type=FastBuild
-	touch $@
-
-$(KEVM_SUBMODULE)/make.timestamp: $(KEVM_SUBMODULE)/submodule.timestamp $(K_SUBMODULE)/mvn.timestamp
-	cd $(KEVM_SUBMODULE) \
-		&& make tangle-deps \
-		&& make defn \
-		&& $(K_BIN)/kompile -v --debug --backend java -I $(KEVM_BUILD) -d $(KEVM_BUILD) --main-module ETHEREUM-SIMULATION --syntax-module ETHEREUM-SIMULATION $(KEVM_BUILD)/driver.k
-	touch $@
-
-.PHONY: clean clean-deps clean-k clean-kevm clean-kevm-cache
-
-clean:
+clean: clean-kevm clean-specs
 	rm -rf $(BUILD_DIR)
-
-clean-deps: clean clean-k clean-kevm
-clean-k:
-	rm -rf $(K_SUBMODULE)/mvn.timestamp
 clean-kevm:
-	rm -rf $(KEVM_SUBMODULE)/make.timestamp $(KEVM_BUILD)/driver-kompiled
-clean-kevm-cache:
-	rm -rf $(KEVM_BUILD)/driver-kompiled/cache.bin
+	rm -rf $(DEFN_DIR)
+clean-specs:
+	rm -rf $(SPECS_DIR)
 
 # Specs
 # -----
-
-SPECS_DIR := $(BUILD_DIR)/specs
 
 SPEC_INI := deposit-spec.ini
 
@@ -86,16 +64,15 @@ TMPLS    := scripts/module-tmpl.k scripts/spec-tmpl.k
 
 .PHONY: specs
 
-specs: $(SPECS_DIR) $(SPEC_FILES) $(LEMMA_FILES)
-
-$(SPECS_DIR):
-	mkdir -p $@
+specs: $(SPEC_FILES) $(LEMMA_FILES)
 
 $(SPECS_DIR)/%-spec.k: $(TMPLS) $(SPEC_INI)
+	@mkdir -p $(dir $@)
 	python3 $(GEN_SPEC) $(TMPLS) $(SPEC_INI) $* $* > $@
 
 $(SPECS_DIR)/%.k: lemmas/%.k
-	cp -p $< $@
+	@mkdir -p $(dir $@)
+	cp $< $@
 
 # non-standard spec generation
 
@@ -108,14 +85,14 @@ $(SPECS_DIR)/deposit-success-spec.k: $(TMPLS) $(SPEC_INI)
 # Kprove
 # ------
 
-K_OPTS ?= -Xmx24g
+K_OPTS ?= -Xmx8g
 export K_OPTS
 
 PRELUDE_FILE        := lemmas/evm.smt2
 CONCRETE_RULES_FILE := lemmas/concrete-rules.txt
 
 KPROVE_OPTS ?=
-KPROVE_OPTS += -v --debug -d $(KEVM_BUILD)
+KPROVE_OPTS += -v --debug -d $(DEFN_DIR)/java
 KPROVE_OPTS += --no-exc-wrap --no-alpha-renaming
 KPROVE_OPTS += --deterministic-functions --cache-func-optimized --format-failures
 KPROVE_OPTS += --z3-impl-timeout 500

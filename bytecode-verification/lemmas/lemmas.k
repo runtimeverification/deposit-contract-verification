@@ -1,4 +1,4 @@
-requires "edsl.k"
+requires "edsl.md"
 
 // NOTE: This module includes all lemmas (except assosiativity ones) in both lemmas.md and evm-data-map-symbolic.k
 

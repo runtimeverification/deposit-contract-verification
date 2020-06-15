@@ -8,6 +8,7 @@ rule
     <evm>
       <output> {OUTPUT} </output>
       <statusCode> {STATUS_CODE} </statusCode>
+      <endPC> _ => ?_ </endPC>
       <touchedAccounts> _ => ?_ </touchedAccounts>
       <callState>
         <program> #parseByteStack({CODE}) </program>

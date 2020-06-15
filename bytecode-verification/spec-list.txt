@@ -1,19 +1,19 @@
 init-success                            | -m VERIFICATION    --branching-allowed 0  --boundary-cells k
 init-revert                             | -m VERIFICATION    --branching-allowed 0  --boundary-cells k
 
-get_deposit_root-success                | -m VERIFICATION    --branching-allowed 0  --boundary-cells k
-get_deposit_root-success-loop           | -m VERIFICATION-L1 --branching-allowed 1  --boundary-cells k,pc
-get_deposit_root-revert                 | -m VERIFICATION    --branching-allowed 0  --boundary-cells k
-
-get_deposit_count-success               | -m VERIFICATION    --branching-allowed 0  --boundary-cells k
-get_deposit_count-revert                | -m VERIFICATION    --branching-allowed 0  --boundary-cells k
-
 deposit-success                         | -m VERIFICATION    --branching-allowed 31 --boundary-cells k
 deposit-success-loop                    | -m VERIFICATION    --branching-allowed 0  --boundary-cells k,pc
 deposit-revert                          | -m VERIFICATION    --branching-allowed 4  --boundary-cells k
 
 deposit-calldata-decoding-success       | -m VERIFICATION    --branching-allowed 0  --boundary-cells k,pc
 deposit-calldata-decoding-revert        | -m VERIFICATION    --branching-allowed 9  --boundary-cells k
+
+get_deposit_root-success                | -m VERIFICATION    --branching-allowed 0  --boundary-cells k
+get_deposit_root-success-loop           | -m VERIFICATION-L1 --branching-allowed 1  --boundary-cells k,pc
+get_deposit_root-revert                 | -m VERIFICATION    --branching-allowed 0  --boundary-cells k
+
+get_deposit_count-success               | -m VERIFICATION    --branching-allowed 0  --boundary-cells k
+get_deposit_count-revert                | -m VERIFICATION    --branching-allowed 0  --boundary-cells k
 
 supportsInterface-success               | -m VERIFICATION    --branching-allowed 1  --boundary-cells k
 supportsInterface-revert                | -m VERIFICATION    --branching-allowed 1  --boundary-cells k

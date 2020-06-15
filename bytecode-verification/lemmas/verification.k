@@ -1,4 +1,4 @@
-requires "edsl.k"
+requires "edsl.md"
 requires "lemmas.k"
 
 module VERIFICATION-L1
@@ -21,6 +21,8 @@ module VERIFICATION
     imports EVM
     imports EDSL
     imports LEMMAS
+
+    rule #sizeByteArray(WS) => #sizeWordStack(WS)
 
     // function signature extraction
 

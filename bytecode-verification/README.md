@@ -18,6 +18,7 @@ The specification has been formally verified against the following compiled byte
 
 To verify the formal specification:
 ```
+$ git submodule update --init --recursive -- ..
 $ make deps
 $ make specs
 $ make verify
@@ -28,7 +29,7 @@ Prerequisites:
    * Set environment variables:
      ```
      export PATH=/path/to/z3-4.6.0/bin:$PATH
-     export LD_LIBRARY_PATH=/path/to/z3-4.6.0//bin:$LD_LIBRARY_PATH
+     export LD_LIBRARY_PATH=/path/to/z3-4.6.0/bin:$LD_LIBRARY_PATH
      ```
  * System dependencies: https://github.com/kframework/evm-semantics#system-dependencies
 

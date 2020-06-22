@@ -9,7 +9,9 @@ The correctness proof presented in the report has also been mechanized in K:
 
 To run the mechanized proof:
 ```
-$ ./run.sh
+$ make deps
+$ make build
+$ make test
 ```
 
 Prerequisites:

@@ -31,11 +31,13 @@ export PYTHONPATH
 
 KEVM_MAKE := make --directory $(KEVM_SUBMODULE) DEPS_DIR=$(KEVM_SUBMODULE)/deps BUILD_DIR=$(CURDIR)/$(BUILD_DIR) K_RELEASE=$(K_RELEASE) RELEASE=$(RELEASE)
 
-.PHONY: deps deps-k deps-kevm
+.PHONY: deps deps-k deps-plugin deps-kevm
 
-deps: deps-k deps-kevm
+deps: deps-k deps-plugin deps-kevm
 deps-k:
 	$(KEVM_MAKE) deps SKIP_LLVM=true SKIP_HASKELL=true
+deps-plugin:
+	$(KEVM_MAKE) plugin-deps
 deps-kevm:
 	$(KEVM_MAKE) build-java
 
